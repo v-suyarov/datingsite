@@ -135,3 +135,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Подключение библиотек для работы postgis
 GDAL_LIBRARY_PATH = 'venv/Lib/site-packages/osgeo/gdal304.dll'
 GEOS_LIBRARY_PATH = 'venv/Lib/site-packages/pygeos.libs/geos_c-6932ee63ecfb13ff3a77b9b9455a3f60.dll'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ]
+}
