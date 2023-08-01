@@ -35,7 +35,7 @@ class ParticipantSerializer(serializers.ModelSerializer):
         user = user_serializer.save()
         # добавление водяного знака на аватар пользователя
         avatar = Image.open(validated_data["avatar"])
-        avatar = apply_watermark(avatar)
+        avatar = apply_watermark(avatar, path_to_watermark='static/img/watermark.png')
         validated_data["avatar"] = avatar
         participant = Participant.objects.create(user=user, **validated_data)
 

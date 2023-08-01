@@ -5,8 +5,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 import io
 
 
-def apply_watermark(image):
-    watermark = Image.open(os.path.join(settings.BASE_DIR, 'static/img/watermark.png'))
+def apply_watermark(image, path_to_watermark):
+    watermark = Image.open(os.path.join(settings.BASE_DIR, path_to_watermark))
     watermark = watermark.resize(image.size)
 
     image.paste(watermark, (0, 0), mask=watermark)
