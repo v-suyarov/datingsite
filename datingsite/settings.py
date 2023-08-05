@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-mh#1o((#00uxxzxo%ikgx@#-@_6g1e@t0$hit4dewm&pvh-hv='
+SECRET_KEY = config.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -81,8 +82,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'datingsite_db',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
+        'USER': config.DATABASES_USER,
+        'PASSWORD': config.DATABASES_PASSWORD,
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
@@ -144,8 +145,8 @@ REST_FRAMEWORK = {
 # Email Config
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.mail.ru'
-EMAIL_HOST_USER = 'datingsite_info@mail.ru'
-EMAIL_HOST_PASSWORD = '4YpLcMrFbF9WvHKKMXTp'
+EMAIL_HOST_USER = config.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = config.DATABASES_PASSWORD
 EMAIL_PORT = 465
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
