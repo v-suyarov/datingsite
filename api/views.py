@@ -1,22 +1,15 @@
 from django.contrib.gis.db.models import PointField
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
-
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from django.conf import settings
 from clients.models import Participant
 from clients.serializers import ParticipantSerializer, ParticipantMathSerializer
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, generics, status
+from rest_framework import filters
 from django.db.models import F, Func
-
-
-from clients.utils import send_sympathy_email
-
-email_pass = 'H_DLdlf2d20'
 
 
 class ParticipantCreateAPIView(CreateAPIView):
