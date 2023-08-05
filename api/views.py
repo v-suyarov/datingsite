@@ -1,14 +1,22 @@
 from django.contrib.gis.db.models import PointField
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
+
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
+from django.conf import settings
 from clients.models import Participant
-from clients.serializers import ParticipantSerializer
+from clients.serializers import ParticipantSerializer, ParticipantMathSerializer
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, generics
+from rest_framework import filters, generics, status
 from django.db.models import F, Func
+
+
+from clients.utils import send_sympathy_email
+
+email_pass = 'H_DLdlf2d20'
 
 
 class ParticipantCreateAPIView(CreateAPIView):
@@ -25,7 +33,7 @@ class ParticipantCreateAPIView(CreateAPIView):
         return response
 
 
-class ParticipantListView(generics.ListAPIView):
+class ParticipantListView(ListAPIView):
     queryset = Participant.objects.prefetch_related("likes")
     serializer_class = ParticipantSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
@@ -47,3 +55,30 @@ class ParticipantListView(generics.ListAPIView):
             ).filter(fact_distance__lt=float(max_distance))
 
         return queryset
+
+
+class ParticipantRateUpdateAPIView(UpdateAPIView):
+    """
+    Rate the participant.
+    """
+    queryset = Participant.objects.all()
+    serializer_class = ParticipantMathSerializer
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        instance = get_object_or_404(Participant, pk=request.user.pk)
+        request.data['evaluated_pk'] = kwargs['pk']
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        evaluated = Participant.objects.get(pk=serializer.validated_data['evaluated_pk'])
+        sympathy_before = serializer.instance.likes.contains(evaluated)
+        self.perform_update(serializer)
+
+        message = "Вы успешно оценили выбранного участника"
+
+        if sympathy_before:
+            message = "Вы уже оценивали выбранного участника"
+        elif evaluated.likes.contains(serializer.instance):
+            message = "У вас возникла взаимная симпатия, сообщеня с информацией были отправлены вам на почту"
+        return Response({"message": message, 'data': serializer.data})

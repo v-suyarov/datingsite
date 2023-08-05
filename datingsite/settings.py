@@ -136,9 +136,19 @@ MEDIA_ROOT = BASE_DIR / 'media'
 GDAL_LIBRARY_PATH = 'venv/Lib/site-packages/osgeo/gdal304.dll'
 GEOS_LIBRARY_PATH = 'venv/Lib/site-packages/pygeos.libs/geos_c-6932ee63ecfb13ff3a77b9b9455a3f60.dll'
 
-
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ]
 }
+# Email Config
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_HOST_USER = 'datingsite_info@mail.ru'
+EMAIL_HOST_PASSWORD = '4YpLcMrFbF9WvHKKMXTp'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+
+
+

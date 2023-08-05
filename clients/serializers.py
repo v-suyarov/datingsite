@@ -40,3 +40,28 @@ class ParticipantSerializer(serializers.ModelSerializer):
         participant = Participant.objects.create(user=user, **validated_data)
 
         return participant
+
+
+class ParticipantMathSerializer(serializers.ModelSerializer):
+    evaluated_pk = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = Participant
+        fields = ['evaluated_pk']
+
+    def update(self, instance, validated_data):
+        evaluated = Participant.objects.get(pk=validated_data['evaluated_pk'])
+        instance.likes.add(evaluated)
+        instance.save()
+        return instance
+
+    def validate_evaluated_pk(self, value):
+        if not Participant.objects.filter(pk=value).exists():
+            raise serializers.ValidationError("Идентификатор оцениваемого участника недействителен")
+
+        return value
+
+    def validate(self, data):
+        if data['evaluated_pk'] == self.instance.pk:
+            raise serializers.ValidationError("Невозможно оценить самого себя")
+        return data
