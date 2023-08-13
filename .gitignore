@@ -1,10 +1,14 @@
+#myignore
+media
+config.py
+
 # Django #
 *.log
 *.pot
 *.pyc
 __pycache__
 db.sqlite3
-media
+
 
 # Backup files #
 *.bak 
