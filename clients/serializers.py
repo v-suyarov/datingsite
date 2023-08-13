@@ -1,5 +1,6 @@
 from PIL import Image
 from django.contrib.auth.models import User
+from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 from rest_framework import serializers
 from clients.models import Participant
 
@@ -22,11 +23,13 @@ class UserSerializer(serializers.ModelSerializer):
 class ParticipantSerializer(serializers.ModelSerializer):
     username = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)
-    likes = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    email = serializers.EmailField(write_only=True)
+    latitude = serializers.DecimalField(max_digits=9, decimal_places=6, write_only=True)
+    longitude = serializers.DecimalField(max_digits=9, decimal_places=6, write_only=True)
 
     class Meta:
         model = Participant
-        exclude = ["id", "user"]
+        exclude = ["id", "user", 'likes']
 
     def create(self, validated_data):
         user_serializer = UserSerializer(data={"username": validated_data.pop("username"),
@@ -43,25 +46,22 @@ class ParticipantSerializer(serializers.ModelSerializer):
 
 
 class ParticipantMathSerializer(serializers.ModelSerializer):
-    evaluated_pk = serializers.IntegerField(write_only=True)
-
     class Meta:
         model = Participant
-        fields = ['evaluated_pk']
+        fields = []
 
     def update(self, instance, validated_data):
-        evaluated = Participant.objects.get(pk=validated_data['evaluated_pk'])
+        evaluated = Participant.objects.get(pk=self.context.get('pk'))
         instance.likes.add(evaluated)
         instance.save()
         return instance
 
-    def validate_evaluated_pk(self, value):
-        if not Participant.objects.filter(pk=value).exists():
-            raise serializers.ValidationError("Идентификатор оцениваемого участника недействителен")
-
-        return value
-
     def validate(self, data):
-        if data['evaluated_pk'] == self.instance.pk:
-            raise serializers.ValidationError("Невозможно оценить самого себя")
+        evaluated_pk = self.context.get('pk', None)
+
+        if not Participant.objects.filter(pk=evaluated_pk).exists():
+            raise serializers.ValidationError({"pk": "Идентификатор оцениваемого участника недействителен"})
+
+        if evaluated_pk == self.instance.pk:
+            raise serializers.ValidationError({"pk": "Невозможно оценить самого себя"})
         return data

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'rest_framework',
     'django.contrib.gis',
+    'drf_spectacular',
 
     'clients',
     'api',
@@ -141,8 +142,20 @@ GEOS_LIBRARY_PATH = 'venv/Lib/site-packages/pygeos.libs/geos_c-6932ee63ecfb13ff3
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'EXCEPTION_HANDLER': 'api.exceptions.custom_exception_handler'
 }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Datingsite API',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    # OTHER SETTINGS
+}
+
 # Email Config
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.mail.ru'
